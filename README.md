@@ -14,11 +14,12 @@ The features of the dataset are split up into 5 groups
 - B_* = Balance variables
 - R_* = Risk variables
 
-The following features are categorical while the rest are normalized continuous data
-` ['B_30', 'B_38', 'D_114', 'D_116', 'D_117', 'D_120', 'D_126', 'D_63', 'D_64', 'D_66', 'D_68'] `
+The following features are categorical while the rest are normalized continuous data:
 
-## Insights from the data
+` ['B_30', 'B_38', 'D_114', 'D_116', 'D_117', 'D_120', 'D_126', 'D_63', 'D_64', 'D_66', 'D_68'] `
 
 ## Technologies Utilized
 - Python
 - PySpark
+
+## Insights from the data
