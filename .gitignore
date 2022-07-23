@@ -1,5 +1,9 @@
 *.env
 /.ipynb_checkpoints
+*/.ipynb_checkpoints
+*.xgb
+*.csv
+
 # /tests
 # /models
 # /feature_engineering
