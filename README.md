@@ -53,7 +53,11 @@ Gave up EDA in favor of looking at other people's EDA. 🙂
 
 I followed the [XGBoost Kaggle Starter](https://www.kaggle.com/code/cdeotte/xgboost-starter-0-793) by Chris Deotte as my first submission. I used this as a way to get a first submission in fast. I will use the general structure of the notebook as the basis for future models.
 
-#### Model 2:
+#### Model 2: CatBoost Model
+> Score: 0.792
+I used the same features as the [XGBoost Kaggle Starter](https://www.kaggle.com/code/cdeotte/xgboost-starter-0-793) but replaced XGBoost with CatBoost. To my surprise the CatBoost model performed worse than the XGBoost model. I tried the default CatBoost model, CatBoostClassifier, and CatBoostRegressor models without any hyperparameter tuning. None of these models outperformed XGBoost. Perhaps with hyperparameter tuning they will work better but as of now I want to focus on engineering more than choosing models. 
+
+#### Model 3: 
 
 ## Feature Engineering
 
