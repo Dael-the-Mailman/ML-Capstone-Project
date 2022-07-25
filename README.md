@@ -1,5 +1,6 @@
 # UCSD Extension ML Capstone Project
 > Author: Kaleb Ugalde
+> Rank: 1823/3347
 
 ![American Express Logo](https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/American_Express_logo_(2018).svg/1200px-American_Express_logo_(2018).svg.png "American Express - Default Prediction")
 
@@ -7,6 +8,9 @@
 Given the data provided by American Express predict whether or not a customer will default on their credit card. Applications for this technology are risk management and creating the infrastructure for large scale data analytics.
 
 ## About the Application
+==TODO==
+
+## Table of Contents
 ==TODO==
 
 ### Format of the data
