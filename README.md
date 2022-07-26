@@ -1,5 +1,6 @@
 # UCSD Extension ML Capstone Project
 > Author: Kaleb Ugalde
+
 > Rank: 257/3430
 
 ![American Express Logo](https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/American_Express_logo_(2018).svg/1200px-American_Express_logo_(2018).svg.png "American Express - Default Prediction")
@@ -64,6 +65,7 @@ I used the same features as the [XGBoost Kaggle Starter](https://www.kaggle.com/
 
 #### Model 3: Rank and Mean Ensemble
 > Score: 0.799
+
 I used the data from [AMEX Rank Ensemble](https://www.kaggle.com/code/finlay/amex-rank-ensemble) by MAXXX and submitted his output to the competition. This made my position jump from 1823 to 257 at the time of writing this entry. I didn't write the code for this since the code seems pretty simple. This inspires me to look into ensemble methods for drastic increases in performance. I will look further into how people ensemble data in this competition and other competitions.
 
 #### Model 4: 
