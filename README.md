@@ -1,6 +1,6 @@
 # UCSD Extension ML Capstone Project
 > Author: Kaleb Ugalde
-> Rank: 1823/3347
+> Rank: 257/3430
 
 ![American Express Logo](https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/American_Express_logo_(2018).svg/1200px-American_Express_logo_(2018).svg.png "American Express - Default Prediction")
 
@@ -62,7 +62,11 @@ I followed the [XGBoost Kaggle Starter](https://www.kaggle.com/code/cdeotte/xgbo
 
 I used the same features as the [XGBoost Kaggle Starter](https://www.kaggle.com/code/cdeotte/xgboost-starter-0-793) but replaced XGBoost with CatBoost. To my surprise the CatBoost model performed worse than the XGBoost model. I tried the default CatBoost model, CatBoostClassifier, and CatBoostRegressor models without any hyperparameter tuning. None of these models outperformed XGBoost. Perhaps with hyperparameter tuning they will work better but as of now I want to focus on engineering more than choosing models. 
 
-#### Model 3: 
+#### Model 3: Rank and Mean Ensemble
+> Score: 0.799
+I used the data from [AMEX Rank Ensemble](https://www.kaggle.com/code/finlay/amex-rank-ensemble) by MAXXX and submitted his output to the competition. This made my position jump from 1823 to 257 at the time of writing this entry. I didn't write the code for this since the code seems pretty simple. This inspires me to look into ensemble methods for drastic increases in performance. I will look further into how people ensemble data in this competition and other competitions.
+
+#### Model 4: 
 
 ## Feature Engineering
 
