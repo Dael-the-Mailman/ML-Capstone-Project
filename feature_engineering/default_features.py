@@ -24,3 +24,26 @@ def process_and_feature_engineer(df):
 if __name__ == '__main__':
     config = dotenv_values('../.env')
     
+    # Load Target Data
+    print("Loading Target Data")
+    targets = pd.read_csv(config["TRAIN_LABELS_PATH"])
+    targets = targets.set_index('customer_ID')
+
+    # Process Training Data
+    print("Processing Training Data")
+    train = pd.read_parquet(config["INT_TRAIN_PARQUET"])
+    train = process_and_feature_engineer(train)
+    train = train.merge(targets, left_index=True, right_index=True, how='left')
+    train = train.sort_index().reset_index()
+    train.to_parquet(config["ENGINEERED_DATA"] + "default_train_features.parquet")
+    del train
+
+    # Process Testing Data
+    print("Processing Test Data")
+    test = pd.read_parquet(config["INT_TEST_PARQUET"])
+    test = process_and_feature_engineer(test)
+    test = test.merge(targets, left_index=True, right_index=True, how='left')
+    test = test.sort_index().reset_index()
+    test.to_parquet(config["ENGINEERED_DATA"] + "default_test_features.parquet")
+    del test
+
