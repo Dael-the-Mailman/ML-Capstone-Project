@@ -8,7 +8,7 @@ from sklearn.model_selection import KFold
 from sklearnex import patch_sklearn
 patch_sklearn()
 
-from sklearn.linear_model import LogisticRegression 
+from sklearn.ensemble import HistGradientBoostingRegressor
 
 def amex_metric_mod(y_true, y_pred):
     labels     = np.transpose(np.array([y_true, y_pred]))
@@ -69,10 +69,8 @@ if __name__ == '__main__':
         X_valid = train.loc[valid_idx, FEATURES]
         y_valid = train.loc[valid_idx, 'target']
 
-        model=LogisticRegression(
-            penalty='elasticnet',
-            max_iter=1000,
-            n_jobs=-1
+        model=HistGradientBoostingRegressor(
+            max_iter=9999
         )
         model.fit(X_train, y_train)
 
