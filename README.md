@@ -68,6 +68,9 @@ I used the same features as the [XGBoost Kaggle Starter](https://www.kaggle.com/
 
 I used the data from [AMEX Rank Ensemble](https://www.kaggle.com/code/finlay/amex-rank-ensemble) by MAXXX and submitted his output to the competition. This made my position jump from 1823 to 257 at the time of writing this entry. I didn't write the code for this since the code seems pretty simple. This inspires me to look into ensemble methods for drastic increases in performance. I will look further into how people ensemble data in this competition and other competitions.
 
+### Model 4: Ensemble a lot of simple models
+
+
 #### Model 4: 
 
 ## Feature Engineering
