@@ -70,7 +70,11 @@ if __name__ == '__main__':
         y_valid = train.loc[valid_idx, 'target']
 
         model=LogisticRegression(
+            C=y_train.mean(),
+            tol=0.002,
             penalty='elasticnet',
+            solver='saga',
+            l1_ratio=0.5,
             max_iter=1000,
             n_jobs=-1
         )
