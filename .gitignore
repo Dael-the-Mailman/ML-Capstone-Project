@@ -6,6 +6,7 @@
 */catboost_info
 */lgbm_models
 */xgb_models
+*/agModels-predictClass
 
 # Files
 *.xgb
