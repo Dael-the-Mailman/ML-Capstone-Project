@@ -3,19 +3,19 @@ Derived from https://www.kaggle.com/code/finlay/amex-rank-ensemble
 '''
 import numpy as np 
 import pandas as pd 
+import os
 
 from dotenv import dotenv_values
 from scipy.stats import rankdata
 
-DESC = "lowered_ensemble_size"
+DESC = "idc"
 
 # Read configuration file
 config = dotenv_values('.env')
 
 
 # Gather all submissions to ensemble
-paths = [config["OTHER_SUBMISSIONS"] + "lgbm_fgen_submission.csv",
-         config["OTHER_SUBMISSIONS"] + "best_of_both_worlds_submission.csv"]
+paths = [config["OTHER_SUBMISSIONS"] + x for x in os.listdir(config["OTHER_SUBMISSIONS"])]
 print("Read and Load DataFrames")
 dfs = [pd.read_csv(x) for x in paths]
 dfs = [x.sort_values(by='customer_ID') for x in dfs]
