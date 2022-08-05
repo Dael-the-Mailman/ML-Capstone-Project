@@ -93,8 +93,8 @@ if __name__ == "__main__":
         labels["prediction"] = sub
         if path == ext_reg_path:
             print("Saving Extended Regression Submission")
-            labels.to_csv(config["SUBMISSION_FOLDER"] + "flaml_extended_regression_fe_submission.csv")
+            labels.to_csv(config["SUBMISSION_FOLDER"] + "flaml_extended_regression_fe_submission.csv", index=False)
         else:
             print("Saving Regression Submission")
-            labels.to_csv(config["SUBMISSION_FOLDER"] + "flaml_regression_fe_submission.csv")
+            labels.to_csv(config["SUBMISSION_FOLDER"] + "flaml_regression_fe_submission.csv", index=False)
     del labels, sub

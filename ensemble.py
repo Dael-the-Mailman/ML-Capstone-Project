@@ -8,14 +8,16 @@ import os
 from dotenv import dotenv_values
 from scipy.stats import rankdata
 
-DESC = "idc"
+DESC = "plus_extended"
 
 # Read configuration file
 config = dotenv_values('.env')
 
 
 # Gather all submissions to ensemble
-paths = [config["OTHER_SUBMISSIONS"] + x for x in os.listdir(config["OTHER_SUBMISSIONS"])]
+# paths = [config["SUBMISSION_FOLDER"] + x for x in os.listdir(config["OTHER_SUBMISSIONS"])]
+paths = [config["SUBMISSION_FOLDER"] + "flaml_regression_fe_submission.csv",
+         config["SUBMISSION_FOLDER"] + "flaml_extended_regression_fe_submission.csv"]
 print("Read and Load DataFrames")
 dfs = [pd.read_csv(x) for x in paths]
 dfs = [x.sort_values(by='customer_ID') for x in dfs]
