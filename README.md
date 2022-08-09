@@ -1,7 +1,7 @@
 # UCSD Extension ML Capstone Project
 > Author: Kaleb Ugalde
 
-> Rank: 257/3430
+> Rank: 639/4203
 
 ![American Express Logo](https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/American_Express_logo_(2018).svg/1200px-American_Express_logo_(2018).svg.png "American Express - Default Prediction")
 
@@ -71,7 +71,21 @@ I used the data from [AMEX Rank Ensemble](https://www.kaggle.com/code/finlay/ame
 ### Model 4: Ensemble a lot of simple models
 
 
-#### Model 4: 
+#### Model 4: FLAML AutoML
+> Score: 0.784
+
+I used the Fast Library for Automated Machine Learning & Tuning(FLAML) by Microsoft. I tested other local AutoML libraries like AutoGluon and EvalML. Both libraries ran out of memory and failed to train some or all models. FLAML also performs hyperparameter tuning for the models as well. One observation is that the model almost always settles on LGBM after an hour of train time.
+
+#### Model 5: FLAML + Extended Training Set
+> Score:
+
+The extended training set was created using the top scoring submissions from the kaggle forums. I find which customer_ID's have over 90% consensus between the top submissions and concatenated them to the training dataset. The idea came from a podcast episode between Demis Hassabis and Lex Fridman and I wanted to see if there would be a performance increase. 
+
+#### Model 6: AutoVIML
+> Score:
+
+#### Model 7: Hyperparameter Tuning 
+> Score: 
 
 ## Feature Engineering
 
