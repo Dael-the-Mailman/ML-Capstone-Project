@@ -4,6 +4,7 @@ import pickle
 import json
 from flaml import AutoML
 from dotenv import dotenv_values
+from sklearn.model_selection import StratifiedKFold
 
 def amex_metric_mod(y_true, y_pred):
     labels     = np.transpose(np.array([y_true, y_pred]))
@@ -30,28 +31,37 @@ if __name__ == "__main__":
 
     # Part 1B: Extended Regression Model
     print("Loading Extended Train FE Data")
-    train = pd.read_parquet(config["ENGINEERED_DATA"] + "train_fe.parquet")
+    train = pd.read_parquet(config["ENGINEERED_DATA"] + "extended_train_fe.parquet")
     FEATURES = train.columns[1:-1]
-    X_train = train[FEATURES]
-    y_train = train["target"]
+    SPLITS = 2
+    RANDOM_STATE = 6474
 
-    print("Training Extended Regression Model")
-    automl = AutoML()
-    automl.fit(X_train, y_train, task="regression", time_budget=3600)
+    skf = StratifiedKFold(n_splits=SPLITS, random_state=RANDOM_STATE, shuffle=True)
+    for fold,(train_idx, valid_idx) in enumerate(skf.split(
+                train, train.target)):
+        X_train = train.loc[train_idx,FEATURES]
+        y_train = train.loc[train_idx,"target"]
 
-    print('Best Extended Regression ML learner:', automl.best_estimator)
-    print('Best hyperparmeter config:', automl.best_config)
-    print('Best loss on validation data: {0:.4g}'.format(automl.best_loss))
-    print('Training duration of best run: {0:.4g} s'.format(automl.best_config_train_time))
-    print("Dumping hyperparameter json")
-    with open(f"{automl.best_estimator}_extended_regression_fe.json", "w") as fp:
-        model = {automl.best_estimator : automl.best_config}
-        json.dump(model, fp)
+        print(f"Training Extended Regression Model Fold {fold+1}")
+        automl = AutoML()
+        automl.fit(X_train, y_train, task="regression", time_budget=3600)
 
-    print("Saving Model")
-    ext_reg_path = config["FLAML_MODELS"] + f'automl_extended_regression_fe_V2{(automl.best_loss):.4g}.pkl'
-    with open(ext_reg_path, 'wb') as f:
-        pickle.dump(automl, f, pickle.HIGHEST_PROTOCOL)
+        print('Best Extended Regression ML learner:', automl.best_estimator)
+        print('Best hyperparmeter config:', automl.best_config)
+        print('Best loss on validation data: {0:.4g}'.format(automl.best_loss))
+        print('Training duration of best run: {0:.4g} s'.format(automl.best_config_train_time))
+        print("Dumping hyperparameter json")
+        with open(f"{automl.best_estimator}_FOLD_{fold+1}_extended_regression_fe.json", "w") as fp:
+            model = {automl.best_estimator : automl.best_config}
+            json.dump(model, fp)
+
+        print("Saving Model")
+        ext_reg_path = config["FLAML_MODELS"] + f'extended_regression_fe_FOLD_{fold+1}_{(automl.best_loss):.4g}.pkl'
+        with open(ext_reg_path, 'wb') as f:
+            pickle.dump(automl, f, pickle.HIGHEST_PROTOCOL)
+
+    import sys
+    sys.exit()
 
     # Part 1C: Load and predict
     print("Load and predict test data")
