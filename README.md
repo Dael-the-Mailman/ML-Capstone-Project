@@ -68,24 +68,21 @@ I used the same features as the [XGBoost Kaggle Starter](https://www.kaggle.com/
 
 I used the data from [AMEX Rank Ensemble](https://www.kaggle.com/code/finlay/amex-rank-ensemble) by MAXXX and submitted his output to the competition. This made my position jump from 1823 to 257 at the time of writing this entry. I didn't write the code for this since the code seems pretty simple. This inspires me to look into ensemble methods for drastic increases in performance. I will look further into how people ensemble data in this competition and other competitions.
 
-### Model 4: Ensemble a lot of simple models
-
-
 #### Model 4: FLAML AutoML
 > Score: 0.784
 
 I used the Fast Library for Automated Machine Learning & Tuning(FLAML) by Microsoft. I tested other local AutoML libraries like AutoGluon and EvalML. Both libraries ran out of memory and failed to train some or all models. FLAML also performs hyperparameter tuning for the models as well. One observation is that the model almost always settles on LGBM after an hour of train time.
 
 #### Model 5: FLAML + Extended Training Set
+> Score: 0.725
+
+The extended training set was created using the top scoring submissions from the kaggle forums. I find which customer_ID's have over 90% consensus between the top submissions and concatenated them to the training dataset. The idea came from a podcast episode between Demis Hassabis and Lex Fridman and I wanted to see if there would be a performance increase. Even though I didn't see a performance increase in the FLAML library, the library did say that if given more time it might perform better.
+
+#### Model 6: AutoVIML + Hyperparameter Tuning
 > Score:
 
-The extended training set was created using the top scoring submissions from the kaggle forums. I find which customer_ID's have over 90% consensus between the top submissions and concatenated them to the training dataset. The idea came from a podcast episode between Demis Hassabis and Lex Fridman and I wanted to see if there would be a performance increase. 
 
-#### Model 6: AutoVIML
-> Score:
-
-#### Model 7: Hyperparameter Tuning 
-> Score: 
+#### Model 7: 
 
 ## Feature Engineering
 
