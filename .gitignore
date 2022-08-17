@@ -8,6 +8,8 @@
 */xgb_models
 */agModels-predictClass
 */catboost_1659413765.1891239
+*/*/.ipynb_checkpoints
+*/*/__pycache__
 
 # Files
 *.xgb
