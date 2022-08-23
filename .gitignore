@@ -10,6 +10,7 @@
 */catboost_1659413765.1891239
 */*/.ipynb_checkpoints
 */*/__pycache__
+*/*/catboost_info
 
 # Files
 *.xgb
