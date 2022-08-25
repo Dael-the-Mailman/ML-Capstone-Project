@@ -8,7 +8,7 @@ import os
 from dotenv import dotenv_values
 from scipy.stats import rankdata
 
-DESC = "plus_extended"
+DESC = "V1"
 
 # Read configuration file
 config = dotenv_values('.env')
@@ -16,8 +16,9 @@ config = dotenv_values('.env')
 
 # Gather all submissions to ensemble
 # paths = [config["SUBMISSION_FOLDER"] + x for x in os.listdir(config["OTHER_SUBMISSIONS"])]
-paths = [config["SUBMISSION_FOLDER"] + "flaml_regression_fe_submission.csv",
-         config["SUBMISSION_FOLDER"] + "flaml_extended_regression_fe_submission.csv"]
+paths = [config["SUBMISSION_FOLDER"] + "viml_cat.csv",
+         config["SUBMISSION_FOLDER"] + "viml_xgb.csv",
+         config["SUBMISSION_FOLDER"] + "viml_lgbm.csv"]
 print("Read and Load DataFrames")
 dfs = [pd.read_csv(x) for x in paths]
 dfs = [x.sort_values(by='customer_ID') for x in dfs]
@@ -32,7 +33,7 @@ for df in dfs:
     
 submit['prediction'] /= len(paths)
 
-submit.to_csv(config["SUBMISSION_FOLDER"] + f'mean_submission_{DESC}.csv', index=None)
+submit.to_csv(config["SUBMISSION_FOLDER"] + f'viml_mean_{DESC}.csv', index=None)
 
 # Rank ensemble
 print("Rank Ensemble")
@@ -44,4 +45,4 @@ for df in dfs:
     
 submit['prediction'] /= len(paths)
 
-submit.to_csv(config["SUBMISSION_FOLDER"] + f'rank_submission_{DESC}.csv', index=None)
+submit.to_csv(config["SUBMISSION_FOLDER"] + f'viml_rank_{DESC}.csv', index=None)
