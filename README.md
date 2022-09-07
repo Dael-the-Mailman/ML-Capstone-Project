@@ -9,11 +9,15 @@
 Given the data provided by American Express predict whether or not a customer will default on their credit card. Applications for this technology are risk management and creating the infrastructure for large scale data analytics.
 
 ## About the Application
-==TODO==
+I have created a web application that will act like a normal bank account. There is an admin console where the admin can monitor which customer is at risk to default on their credit card loan. A notification will also be sent to the customer stating that they are at risk of defaulting on their credit card loans and how they can fix it.
 
 ## Table of Contents
-==TODO==
+* [Data Insights](#data-insights)
+* [Models Tested](#models-tested)
+* [Cloud Architecture and Workflow](#cloud-architecture-and-workflow)
+* [Fullstack Web Application](#fullstack-web-application)
 
+## Data Insights
 ### Format of the data
 The features of the dataset are split up into 5 groups
 - D_* = Delinquency variables
@@ -28,28 +32,8 @@ The following features are categorical while the rest are normalized continuous 
 
 ### Data Used During Development
 I utilized the [AMEX Integer Parquet Dataset](https://www.kaggle.com/datasets/raddar/amex-data-integer-dtypes-parquet-format) by Raddar. This dataset reduces the size of the original dataset considerably. Not only does this make training much faster but it saves on space as well. Performance was also increased as when I tested an XGBoost model on the original dataset the model performed about 30% worse.
-## Technologies Utilized
-#### Machine Learning Technologies
-- Python
-- PySpark
-- NumPy
-- Matplotlib
-- Scikit Learn
-- XGBoost
-- CatBoost
 
-#### Cloud Technologies
-- Databricks?
-- AWS?
-
-#### Front End Technologies
-- React?
-- Flutter?
-
-#### Back End Technologies
-- ???
-
-## Insights from the data
+### Exploratory Data Analysis
 Gave up EDA in favor of looking at other people's EDA. 🙂
 
 ## Models Tested
@@ -71,6 +55,7 @@ I used the data from [AMEX Rank Ensemble](https://www.kaggle.com/code/finlay/ame
 #### Model 4: FLAML AutoML
 > Score: 0.784
 
+[FLAML by Microsoft](https://microsoft.github.io/FLAML/)
 I used the Fast Library for Automated Machine Learning & Tuning(FLAML) by Microsoft. I tested other local AutoML libraries like AutoGluon and EvalML. Both libraries ran out of memory and failed to train some or all models. FLAML also performs hyperparameter tuning for the models as well. One observation is that the model almost always settles on LGBM after an hour of train time.
 
 #### Model 5: FLAML + Extended Training Set
@@ -81,5 +66,21 @@ The extended training set was created using the top scoring submissions from the
 #### Model 6: AutoVIML + Hyperparameter Tuning
 > Score: 0.610
 
+[AutoVIML](https://github.com/AutoViML/Auto_ViML)
 Model 6 ended up as an ultimate failure as the model seemed to overfit the data it was trained on. This will be my final model for the competition.
 
+#### Model 7: AutoGluon w/ 50% train & 50% test split
+> Score: 0.795
+
+[AutoGluon by Amazon](https://auto.gluon.ai/stable/index.html)
+Model 7 utilizes the AutoGluon model from Amazon. I was not able to perfom a normal 80/20 train test split since my system would run out of memory. I was only able to get up to 50/50 train test split. Despite being given less training data the model alone was able to outperform all the non-ensembled models I created before. It works by training and testing multiple different models to see which model performed best. It also features a time limit cutoff to help manage time constraints.
+
+## Cloud Architecture and Workflow
+
+#### Technologies
+- 
+
+## Fullstack Web Application
+
+#### Technologies
+- 
