@@ -11,6 +11,7 @@
 */*/.ipynb_checkpoints
 */*/__pycache__
 */*/catboost_info
+*/structured_data_regressor
 
 # Files
 *.xgb
