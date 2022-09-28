@@ -1,7 +1,13 @@
 import numpy as np
 import tensorflow as tf
+import pandas as pd
+
 from tensorflow import keras
 from tensorflow.keras import layers
+import keras.backend as K
+from dotenv import dotenv_values
+
+tf.compat.v1.enable_eager_execution()
 
 class Sampling(layers.Layer):
 
@@ -37,11 +43,13 @@ class VAE(keras.Model):
             reconstruction = self.decoder(z)
             reconstruction_loss = tf.reduce_mean(
                 tf.reduce_sum(
-                    keras.losses.binary_crossentropy(data, reconstruction), axis=(1,2)
+                    keras.losses.binary_crossentropy(data, reconstruction), 
+                    axis=-1, 
+                    keepdims=True
                 )
             )
             kl_loss = -0.5 * (1 + z_log_var - tf.square(z_mean) - tf.exp(z_log_var))
-            kl_loss = tf.reduce_mean(tf.reduce_sum(kl_loss, axis=1))
+            kl_loss = tf.reduce_mean(tf.reduce_sum(kl_loss, axis=-1,keepdims=True))
             total_loss = reconstruction_loss + kl_loss
         grads = tape.gradient(total_loss, self.trainable_weights)
         self.optimizer.apply_gradients(zip(grads, self.trainable_weights))
@@ -55,7 +63,7 @@ class VAE(keras.Model):
         }
 
 latent_dim = 72
-
+input_size = 1326
 # Encoder Model
 # encoder_inputs = keras.Input(shape=(28, 28, 1))
 # x = layers.Conv2D(32,3, activation="relu", strides=2, padding="same")(encoder_inputs)
@@ -79,16 +87,39 @@ latent_dim = 72
 # print(decoder.summary())
 
 # Encoder
-input_feat = layers.Input(shape=(1326,))
-layer_1 = Dense()(input_feat)
+input_feat = keras.Input(shape=(input_size,))
+x = layers.Dense(1024, activation='relu')(input_feat)
+x = layers.Dense(512, activation='relu')(x)
+x = layers.Dense(256, activation='relu')(x)
+x = layers.Dense(128, activation='relu')(x)
+z_mean = layers.Dense(latent_dim, name="z_mean")(x)
+z_log_var = layers.Dense(latent_dim, name="z_log_var")(x)
+z = Sampling()([z_mean, z_log_var])
+encoder = keras.Model(input_feat, [z_mean, z_log_var, z], name="encoder")
+# print(encoder.summary())
 
 # Decoder
+latent_inputs = keras.Input(shape=(latent_dim,))
+x = layers.Dense(128, activation='relu')(latent_inputs)
+x = layers.Dense(256, activation='relu')(x)
+x = layers.Dense(512, activation='relu')(x)
+x = layers.Dense(1024, activation='relu')(x)
+decoder_outputs = layers.Dense(input_size, activation='relu')(x)
+decoder = keras.Model(latent_inputs, decoder_outputs, name="decoder")
+# print(decoder.summary())
 
 # Train the VAE
-(x_train, _), (x_test, _) = keras.datasets.mnist.load_data()
-mnist_digits = np.concatenate([x_train, x_test], axis=0)
-mnist_digits = np.expand_dims(mnist_digits, -1).astype("float32") / 255.0
+# (x_train, _), (x_test, _) = keras.datasets.mnist.load_data()
+# mnist_digits = np.concatenate([x_train, x_test], axis=0)
+# mnist_digits = np.expand_dims(mnist_digits, -1).astype("float32") / 255.0
+
+config = dotenv_values('../.env')
+
+train = pd.read_parquet(config["ENGINEERED_DATA"] + "imputed_train.parquet")
+FEATURES = train.columns[1:-1]
+# print(train.head())
+# print(train[FEATURES][:10000])
 
 vae = VAE(encoder, decoder)
 vae.compile(optimizer=keras.optimizers.Adam())
-vae.fit(mnist_digits, epochs=30, batch_size=128)
+vae.fit(train[FEATURES][:10000], epochs=1, batch_size=128)
