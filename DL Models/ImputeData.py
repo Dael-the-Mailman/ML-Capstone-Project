@@ -203,8 +203,6 @@ numeric = [
             'D_68_count', 'D_68_last', 'D_68_nunique'
         ]
 
-imputer = SimpleImputer(strategy="median", add_indicator=True)
-
 categorical_processor = Pipeline(
     steps=[
         ('catimputer', SimpleImputer(strategy="most_frequent", add_indicator=True))
