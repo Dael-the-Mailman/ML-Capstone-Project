@@ -230,7 +230,7 @@ imputed_train["target"] = train_target
 imputed_train.set_index("customer_ID", inplace=True)
 imputed_train.reset_index(inplace=True)
 imputed_train.columns = [str(c) for c in imputed_train.columns]
-imputed_train.to_parquet(config["ENGINEERED_DATA"] + "imputed_train.parquet", index=False)
+imputed_train.to_csv(config["ENGINEERED_DATA"] + "imputed_train.csv", index=False)
 
 del train, imputed_train
 test = pd.read_parquet(config["ENGINEERED_DATA"] + "test_fe.parquet")
@@ -240,4 +240,4 @@ imputed_test["customer_ID"] = test_id
 imputed_test.set_index("customer_ID", inplace=True)
 imputed_test.reset_index(inplace=True)
 imputed_test.columns = [str(c) for c in imputed_test.columns]
-imputed_test.to_parquet(config["ENGINEERED_DATA"] + "imputed_test.parquet", index=False)
+imputed_test.to_csv(config["ENGINEERED_DATA"] + "imputed_test.csv", index=False)
