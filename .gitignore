@@ -12,6 +12,8 @@
 */*/__pycache__
 */*/catboost_info
 */structured_data_regressor
+*/.vscode
+*/*/lightning_logs
 
 # Files
 *.xgb
@@ -20,3 +22,4 @@
 *.cbm
 *.pkl
 *.json
+*.lr_find_*
