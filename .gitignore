@@ -14,6 +14,7 @@
 */structured_data_regressor
 */.vscode
 */*/lightning_logs
+*__pycache__
 
 # Files
 *.xgb
