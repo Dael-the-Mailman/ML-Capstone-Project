@@ -440,6 +440,7 @@ class AttentiveTransformer(nn.Module):
             vbs=vbs, 
             momentum=momentum
         )
+        self.selector = utils.Sparsemax(dim=-1)
     
     def forward(self, priors, processed_feat):
         x = self.fc(processed_feat)

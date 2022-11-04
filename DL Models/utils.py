@@ -1,5 +1,6 @@
 import torch
 import numpy as np
+import torch.nn as nn
 from torch.autograd import Function
 from torch.utils.data import Dataset
 
@@ -22,16 +23,6 @@ def _make_ix_like(input, dim=0):
     view = [1] * input.dim()
     view[0] = -1
     return rho.view(view).transpose(0, dim)
-
-class AMEXDataset(Dataset):
-    def __init__(self):
-        pass
-
-    def __len__(self):
-        pass
-
-    def __getitem__(self, idx):
-        pass
 
 class SparsemaxFunction(Function):
     """
@@ -102,3 +93,13 @@ class SparsemaxFunction(Function):
         return tau, support_size
 
 sparsemax = SparsemaxFunction.apply
+
+class Sparsemax(nn.Module):
+
+    def __init__(self, dim=-1):
+        self.dim = dim
+        super(Sparsemax, self).__init__()
+
+    def forward(self, input):
+        return sparsemax(input, self.dim)
+
