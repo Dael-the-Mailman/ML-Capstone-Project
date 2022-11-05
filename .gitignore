@@ -15,6 +15,7 @@
 */.vscode
 */*/lightning_logs
 *__pycache__
+*model_parameters
 
 # Files
 *.xgb
