@@ -16,7 +16,7 @@ print("Using", device, "device")
 BATCH_SIZE = 1024
 PATIENCE = 3 # How many epochs will we wait until performance gets better or not?
 SAVE_PATH = "./model_parameters/"
-TIMEOUT = 8*60*60
+TIMEOUT = 1*60*60
 
 # Metric
 def amex_metric_mod(y_true, y_pred):
