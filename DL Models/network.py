@@ -1,8 +1,49 @@
+import argparse
+import json
+import logging
+import os
+import sys
+
 import torch
+import torch.distributed as dist
 import torch.nn as nn
+import torch.nn.functional as F
+import torch.optim as optim
+import torch.utils.data
+import torch.utils.data.distributed
 import numpy as np
+import pandas as pd
 import utils
 
+from torch.nn.utils import clip_grad_norm_
+
+# Set up logging
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+logger.addHandler(logger.StreamHandler(sys.stdout))
+
+# Metric used for validation
+def amex_metric_mod(y_true, y_pred):
+    labels     = np.transpose(np.array([y_true, y_pred]))
+    labels     = labels[labels[:, 1].argsort()[::-1]]
+    weights    = np.where(labels[:,0]==0, 20, 1)
+    cut_vals   = labels[np.cumsum(weights) <= int(0.04 * np.sum(weights))]
+    top_four   = np.sum(cut_vals[:,0]) / np.sum(labels[:,0])
+
+    gini = [0,0]
+    for i in [1,0]:
+        labels         = np.transpose(np.array([y_true, y_pred]))
+        labels         = labels[labels[:, i].argsort()[::-1]]
+        weight         = np.where(labels[:,0]==0, 20, 1)
+        weight_random  = np.cumsum(weight / np.sum(weight))
+        total_pos      = np.sum(labels[:, 0] *  weight)
+        cum_pos_found  = np.cumsum(labels[:, 0] * weight)
+        lorentz        = cum_pos_found / total_pos
+        gini[i]        = np.sum((lorentz - weight_random) * weight)
+
+    return 0.5 * (gini[1]/gini[0] + top_four)
+
+# Based on https://github.com/dreamquark-ai/tabnet
 class GBN(nn.Module):
     def __init__(self, input_dim, vbs=128, momentum=0.02):
         super(GBN, self).__init__()
@@ -675,3 +716,150 @@ class EmbeddingGenerator(nn.Module):
         # concat
         post_embeddings = torch.cat(cols, dim=1)
         return post_embeddings
+
+def train(args):
+    is_distributed = len(args.hosts) > 1 and args.backend is not None
+    logger.debug("Distributed training - {}".format(is_distributed))
+    use_cuda = args.num_gpus > 0
+    logger.debug("Number of gpus available - {}".format(args.num_gpus))
+    device = torch.device("cuda" if use_cuda else "cpu")
+
+    if is_distributed:
+        world_size = len(args.hosts)
+        os.environ["WORLD_SIZE"] = str(world_size)
+        host_rank = args.hosts.index(args.current_host)
+        os.environ["RANK"] = str(host_rank)
+        dist.init_process_group(backend=args.backend,
+                                       rank=host_rank,
+                                       world_size=world_size)
+        logger.info(
+            "Initialized the distributed environment: '{}' backend on {} nodes".format(
+                args.backend, dist.get_world_size()
+            )
+            + "Current host rank is {}. Number of gpus: {}".format(dist.get_rank(), args.num_gpus)
+        )
+    
+    # Magic numbers :)
+    BATCH_SIZE = 1024
+    PATIENCE = 3 # How many epochs will we wait until performance gets better or not?
+    param = {
+        "input_dim": 2319,
+        "output_dim": 1,
+        "n_d": 13,
+        "n_a": 9,
+        "n_steps": 9,
+        "gamma": 1.3077154313342185,
+        "cat_idxs": [],
+        "cat_dims": [],
+        "cat_emb_dim": 1,
+        "n_independent": 2,
+        "n_shared": 2,
+        "epsilon": 1e-15,
+        "vbs": 128,
+        "momentum": 0.03072144877400083
+    }
+    model = TabNet(**param).to(device)
+
+    torch.manual_seed(args.seed)
+    if use_cuda:
+        torch.cuda.manual_seed(args.seed)
+    if is_distributed and use_cuda:
+        model = torch.nn.parallel.DistributedDataParallel(model)
+    else:
+        model = torch.nn.DataParallel(model)
+    
+    optimizer = optim.Adam(model.parameters(), lr=2e-2)
+    
+    first_pass = True
+    oof_tensors = {}
+    best_metric = 0.0 # Keeps track of best metric performance
+    patience_count = 0
+    for epoch in range(1,101): # Runs maximum of 100 epochs
+        # Load Data
+        labels = pd.read_csv(args.data_dir + "train_labels", 
+                             chunksize=BATCH_SIZE)
+        df = pd.read_csv(args.data_dir + "train-0.csv.part", 
+                         chunksize=BATCH_SIZE)
+        total_loss = 0.0
+        model.train()
+        for i, (chunk, chunk_labels) in enumerate(zip(df, labels)):
+            random = np.random.randint(5) # Determines which entries are going to be used in oof prediction
+            x = torch.Tensor(chunk.values).to(device, non_blocking=True)
+            y = torch.Tensor(chunk_labels["target"].values).reshape(-1, 1).to(device, non_blocking=True)
+            if random == 0 and first_pass:
+                # If it's the first pass create the validation set
+                oof_tensors[i] = (x, y)
+                continue
+            if not first_pass and i in oof_tensors.keys():
+                # If not the first pass then skip the training on current entry
+                continue
+
+            # Train Model
+            y_hat, M_loss = model(x)
+            loss = F.mse_loss(y_hat, y) - (1e-3*M_loss)
+            loss.backward()
+            clip_grad_norm_(model.parameters(), 1) # Clip gradient
+            optimizer.step()
+            total_loss += loss.cpu().detach().numpy().item()
+            
+            if i % 2 == 0:
+                optimizer.zero_grad(set_to_none=True)
+        # Validate 
+        model.eval()
+        preds = []
+        labels = []
+        for x, y in list(oof_tensors.values()):
+            y_hat, _ = model(x)
+            preds += y_hat.cpu().detach().numpy().flatten().tolist()
+            labels += y.cpu().detach().numpy().flatten().tolist()
+        metric = amex_metric_mod(labels, preds)
+        logger.info(
+            f"Epoch {epoch} | train_loss: {total_loss / (i-len(oof_tensors)+1):.4f} | validation_metric: {metric:.4f}"
+        )
+        first_pass = False
+
+        # Saves model based on performance over time
+        if metric > best_metric:
+            best_metric = metric
+            patience_count = 0
+            save_model(model, args.model_dir)
+        else:
+            patience_count += 1
+        
+        # If model hasn't improved in given time training stops
+        if patience_count >= PATIENCE:
+            logger.info("Early Stopping Activated!!!")
+            break
+
+def save_model(model, model_dir):
+    logger.info("Saving the model.")
+    path = os.path.join(model_dir, "model.pth")
+    torch.save(model.cpu().state_dict(), path)
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+
+    # Data and model checkpoints directories
+    parser.add_argument("--seed", type=int, default=42, metavar="S", help="random seed (default: 42)")
+    parser.add_argument(
+        "--log-interval",
+        type=int,
+        default=100,
+        metavar="N",
+        help="how many batches to wait before logging training status",
+    )
+    parser.add_argument(
+        "--backend",
+        type=str,
+        default=None,
+        help="backend for distributed training (tcp, gloo on cpu and gloo, nccl on gpu)",
+    )
+
+    # Container environment
+    parser.add_argument("--hosts", type=list, default=json.loads(os.environ["SM_HOSTS"]))
+    parser.add_argument("--current-host", type=str, default=os.environ["SM_CURRENT_HOST"])
+    parser.add_argument("--model-dir", type=str, default=os.environ["SM_MODEL_DIR"])
+    parser.add_argument("--data-dir", type=str, default=os.environ["SM_CHANNEL_TRAINING"])
+    parser.add_argument("--num-gpus", type=int, default=os.environ["SM_NUM_GPUS"])
+
+    train(parser.parse_args())
