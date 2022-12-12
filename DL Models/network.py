@@ -18,9 +18,10 @@ import utils
 from torch.nn.utils import clip_grad_norm_
 
 # Set up logging
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-logger.addHandler(logger.StreamHandler(sys.stdout))
+# logger = logging.getLogger(__name__)
+# logger.setLevel(logging.DEBUG)
+# logger.addHandler(logger.StreamHandler(sys.stdout))
+# logger.
 
 # Metric used for validation
 def amex_metric_mod(y_true, y_pred):
@@ -50,6 +51,7 @@ class GBN(nn.Module):
 
         self.input_dim = input_dim
         self.vbs = vbs
+        self.momentum = momentum
         self.bn = nn.BatchNorm1d(self.input_dim, momentum=momentum)
     
     def forward(self, x):
