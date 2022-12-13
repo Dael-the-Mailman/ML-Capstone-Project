@@ -12,10 +12,19 @@ Given the data provided by American Express predict whether or not a customer wi
 I have created a web application that will act like a normal bank account. There is an admin console where the admin can monitor which customer is at risk to default on their credit card loan. A notification will also be sent to the customer stating that they are at risk of defaulting on their credit card loans and how they can fix it.
 
 ## Table of Contents
+* [How to Run Model](#how-to-run-model)
+* [How to Run Unittests](#how-to-run-unittests)
 * [Data Insights](#data-insights)
 * [Models Tested](#models-tested)
 * [Cloud Architecture and Workflow](#cloud-architecture-and-workflow)
 * [Fullstack Web Application](#fullstack-web-application)
+
+## How to Run Model
+
+## How to Run Unittests
+Go to the [DL Models](./DL%20Models/) directory an run
+
+`python -m unittest` 
 
 ## Data Insights
 ### Format of the data
