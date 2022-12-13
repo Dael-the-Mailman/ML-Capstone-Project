@@ -5,6 +5,7 @@ from network import TabNetDecoder
 
 class TestDecoder(unittest.TestCase):
     def __init__(self, *args, **kwargs):
+        super(TestDecoder, self).__init__(*args, **kwargs)
         self.input_dim = np.random.randint(16,256)
         self.n_d = np.random.randint(16,256)
         self.n_steps = np.random.randint(1,10)
@@ -21,13 +22,20 @@ class TestDecoder(unittest.TestCase):
         )
     
     def test_input_dim(self):
-        pass
+        self.assertEqual(self.test_model.input_dim, self.input_dim)
     
     def test_predictive_layer_dimension(self):
-        pass
+        self.assertEqual(self.test_model.n_d, self.n_d)
+
+    def test_n_steps(self):
+        self.assertEqual(len(self.test_model.feat_transformers), self.n_steps)
+
+    def test_n_independent(self):
+        self.assertEqual(self.test_model.n_independent, self.n_independent)
 
     def test_n_shared(self):
-        pass
+        self.assertEqual(self.test_model.n_shared, self.n_shared)
 
     def test_vbs(self):
-        pass
+        self.assertEqual(self.test_model.vbs, self.vbs)
+    
